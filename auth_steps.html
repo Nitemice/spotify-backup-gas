@@ -1,0 +1,48 @@
+<html>
+
+<head>
+    <title>Spotify Backup Script - First Time Authentication</title>
+</head>
+
+<body>
+    <h1>Spotify Backup Script - First Time Authentication</h1>
+    <ol>
+        <li>
+            <p>
+                Navigate to your Spotify Backup Script app via the
+                <a href="https://developer.spotify.com/dashboard/applications">
+                    Spotify App Dashboard.
+                </a>
+            </p>
+        </li>
+        <li>
+            <p>
+                Add the following URI to the 'Redirect URIs' field,
+                found under "Edit Settings":
+                <br />
+                <code> <?= ScriptApp.getService().getUrl() ?> </code>
+            </p>
+            <p>
+                For more information, see
+                <a href="https://developer.spotify.com/documentation/general/guides/app-settings/">
+                    Spotify's Development Guide.
+                </a>
+            </p>
+        </li>
+        <li>
+            <p>
+                Go to the following URL, log into the desired user's Spotify
+                account, and approve access:
+                <br />
+                <a href="<?= generateAuthUrl() ?>" target="_blank">
+                    <?= generateAuthUrl() ?>
+                </a>
+            </p>
+        </li>
+        <li>
+            You should be redirected back to a success page on Google App Script.
+        </li>
+    </ol>
+</body>
+
+</html>
