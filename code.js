@@ -51,7 +51,7 @@ function backupProfile()
 
     // Save to disk
     var filename = "profile.json";
-    var file = common.updateOrCreateFile(config.backupDir, filename, data);
+    common.updateOrCreateFile(config.backupDir, filename, data);
 }
 
 function backupFollowing()
@@ -66,10 +66,45 @@ function backupFollowing()
     // Fold array of responses into single structure
     data = common.collateArrays("artists.items", data);
 
+    // Sort artists by name
+    data.sort((first, second) =>
+    {
+        if (first.name < second.name)
+        {
+            return -1;
+        }
+        if (first.name > second.name)
+        {
+            return 1;
+        }
+
+        // names must be equal
+        return 0;
+    });
+
     // Save to disk
+    if (config.outputFormat.includes("raw"))
+    {
     var filename = "following.json";
     var followingData = JSON.stringify(data, null, 4);
-    var file = common.updateOrCreateFile(config.backupDir, filename, followingData);
+        common.updateOrCreateFile(config.backupDir, filename, followingData);
+    }
+    if (config.outputFormat.includes("csv"))
+    {
+        var csvData = "name, uri, follower count, genres\n";
+
+        data.forEach(artist =>
+        {
+            var line = artist.name + ",";
+            line += artist.uri + ",";
+            line += artist.followers.total + ",";
+            line += artist.genres.toString() + ",";
+            csvData += line + "\n"
+        });
+
+        var filename = "following.csv";
+        common.updateOrCreateFile(config.backupDir, filename, csvData);
+    }
 }
 
 function main()
