@@ -1,5 +1,5 @@
 // Common GAS Functions
-// v2.0.0 - 2021-04-18
+// v2.1.0 - 2021-09-21
 
 var common = {
 
@@ -131,4 +131,23 @@ var common = {
         return JSON.stringify(JSON.parse(input), null, 4);
     },
 
+    // Collate objects at given path, from array of JSON strings
+    collateArrays: function(path, objects)
+    {
+        var outArray = [];
+        var chunks = path.split('.');
+
+        // Iterate over each object
+        for (const resp of objects)
+        {
+            var obj = JSON.parse(resp);
+            for (const chunk of chunks)
+            {
+                obj = obj[chunk];
+            }
+            outArray = outArray.concat(obj);
+        }
+
+        return outArray;
+    },
 };

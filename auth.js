@@ -95,7 +95,10 @@ function refreshAuth(refreshToken)
     var authInfo = new Object();
 
     authInfo.accessToken = newTokens.access_token;
-    authInfo.refreshToken = newTokens.refresh_token;
+    if (newTokens.refresh_token)
+    {
+        authInfo.refreshToken = newTokens.refresh_token;
+    }
     var now = Date.now() / 1000;
     authInfo.expiry = now + newTokens.expires_in;
     return authInfo;
