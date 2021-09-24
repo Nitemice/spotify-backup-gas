@@ -3,7 +3,8 @@ const baseAuthUrl = "https://accounts.spotify.com";
 const authUrl = baseAuthUrl + "/authorize";
 const refreshUrl = baseAuthUrl + "/api/token";
 
-const scope = "user-read-private user-read-email user-follow-read playlist-read-private playlist-read-collaborative";
+const scope = "user-read-email user-read-private user-follow-read user-library-read \
+playlist-read-private playlist-read-collaborative";
 
 function doGet(e)
 {
