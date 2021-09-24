@@ -114,7 +114,7 @@ function backupFollowing()
 
         data.forEach(artist =>
         {
-            var line = "\"" + artist.name + "\",";
+            var line = JSON.stringify(artist.name) + ",";
             line += artist.uri + ",";
             line += artist.followers.total + ",";
             line += artist.genres.toString() + ",";
@@ -150,14 +150,14 @@ function backupSavedTracks()
 
         data.forEach(track =>
         {
-            var line = "\"" + track.track.name + "\",";
+            var line = JSON.stringify(track.track.name) + ",";
             track.track.artists.forEach(artist =>
             {
-                line += "\"" + artist.name + "\";";
+                line += JSON.stringify(artist.name) + ";";
     
             });
-            line += ",";
-            line += "\"" + track.track.album.name + "\",";
+            line = line.slice(0, -1) + ",";
+            line += JSON.stringify(track.track.album.name) + ",";
             line += track.track.track_number + ",";
             line += track.track.uri + ",";
             line += track.added_at + ",";
@@ -193,13 +193,13 @@ function backupSavedAlbums()
 
         data.forEach(album =>
         {
-            var line = "\"" + album.album.name + "\",";
+            var line = JSON.stringify(album.album.name) + ",";
             album.album.artists.forEach(artist =>
             {
-                line += "\"" + artist.name + "\";";
+                line += JSON.stringify(artist.name) + ";";
 
             });
-            line += ",";
+            line = line.slice(0, -1) + ",";
             line += album.album.uri + ",";
             line += album.added_at + ",";
             csvData += line + "\n"
@@ -234,8 +234,8 @@ function backupSavedShows()
 
         data.forEach(show =>
         {
-            var line = "\"" + show.show.name + "\",";
-            line += "\"" + show.show.publisher + "\",";
+            var line = JSON.stringify(show.show.name) + ",";
+            line += JSON.stringify(show.show.publisher) + ",";
             line += show.show.uri + ",";
             line += show.added_at + ",";
             csvData += line + "\n"
@@ -270,8 +270,8 @@ function backupSavedEpisodes()
 
         data.forEach(episode =>
         {
-            var line = "\"" + episode.episode.name + "\",";
-            line += "\"" + episode.episode.show.name + "\",";
+            var line = JSON.stringify(episode.episode.name) + ",";
+            line += JSON.stringify(episode.episode.show.name) + ",";
             line += episode.episode.uri + ",";
             line += episode.added_at + ",";
             csvData += line + "\n"
