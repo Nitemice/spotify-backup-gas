@@ -1,14 +1,16 @@
 const baseUrl = "https://api.spotify.com/v1";
 
-// Data URLs
+// Profile URLs
 const profileUrl = baseUrl + "/me";
-const followUrl = baseUrl + "/me/following";
 
+// Library URLs
+const followUrl = baseUrl + "/me/following";
 const savedTracksUrl = baseUrl + "/me/tracks";
 const savedAlbumsUrl = baseUrl + "/me/albums";
 const savedShowsUrl = baseUrl + "/me/shows";
 const savedEpisodesUrl = baseUrl + "/me/episodes";
 
+// PLaylist URLs
 const playlistsUrl = baseUrl + "/me/playlists";
 
 function getData(accessToken, url, getAllPages = false)
@@ -60,6 +62,12 @@ function getData(accessToken, url, getAllPages = false)
     }
 
     return data;
+}
+
+// Just a wrapper function to simplify some code
+function xmlElement(type, text)
+{
+    return XmlService.createElement(type).setText(text);
 }
 
 function backupProfile()
@@ -304,11 +312,15 @@ function backupPlaylists()
     var allPlaylists = getData(accessToken, playlistsUrl + params, true);
     allPlaylists = common.collateArrays("items", allPlaylists);
 
+    // Save a list of playlists, in original order (folder order)
+    var playlistList = allPlaylists.map(list => {return list.name});
+    common.updateOrCreateFile(backupFolder, "playlists.txt", playlistList);
+
     // Iterate through the lists and retrieve each one
     for (list of allPlaylists)
     {
         // Retrieve playlist tracks
-        var name = list.name;
+        var name = list.name + "_" + list.id;
         var tracks = getData(accessToken, list.tracks.href + params, true);
         tracks = common.collateArrays("items", tracks);
         list.tracks = tracks;
@@ -319,6 +331,7 @@ function backupPlaylists()
             var output = JSON.stringify(list, null, 4);
             common.updateOrCreateFile(backupFolder, name + ".json", output);
         }
+
         if (config.outputFormat.includes("csv"))
         {
             var csvData = "name, artist, album, track number, uri, date added\n";
@@ -341,31 +354,26 @@ function backupPlaylists()
 
             common.updateOrCreateFile(backupFolder, name + ".csv", csvData);
         }
+
         if (config.outputFormat.includes("xspf"))
         {
             var ns = XmlService.getNamespace("http://xspf.org/ns/0/");
             var root = XmlService.createElement("playlist", ns)
                 .setAttribute("version", "1");
             root.addContent(
-                XmlService.createElement("creator").setText(list.owner.display_name));
-            root.addContent(
-                XmlService.createElement("annotation").setText(list.description));
-            root.addContent(
-                XmlService.createElement("title").setText(name));
-            root.addContent(
-                XmlService.createElement("location").setText(list.external_urls.spotify));
-            root.addContent(
-                XmlService.createElement("identifier").setText(list.uri));
+                xmlElement("creator", list.owner.display_name));
+            root.addContent(xmlElement("annotation", list.description));
+            root.addContent(xmlElement("title", list.name));
+            root.addContent(xmlElement("location", list.external_urls.spotify));
+            root.addContent(xmlElement("identifier", list.uri));
 
             var trackList = XmlService.createElement("trackList");
 
             tracks.forEach(track =>
             {
                 var trackElement = XmlService.createElement("track");
-                trackElement.addContent(
-                    XmlService.createElement("identifier").setText(track.track.uri));
-                trackElement.addContent(
-                    XmlService.createElement("title").setText(track.track.name));
+                trackElement.addContent(xmlElement("identifier", track.track.uri));
+                trackElement.addContent(xmlElement("title", track.track.name));
 
                 var artists = "";
                 track.track.artists.forEach(artist =>
@@ -374,15 +382,20 @@ function backupPlaylists()
 
                 });
                 artists = artists.slice(0, -1);
-                trackElement.addContent(
-                    XmlService.createElement("creator").setText(artists));
+                trackElement.addContent(xmlElement("creator", artists));
 
                 trackElement.addContent(
-                    XmlService.createElement("album").setText(track.track.album.name));
+                    xmlElement("album", track.track.album.name));
                 trackElement.addContent(
-                    XmlService.createElement("trackNum").setText(track.track.track_number));
+                    xmlElement("trackNum", track.track.track_number));
                 trackElement.addContent(
-                    XmlService.createElement("meta").setAttribute("rel", "date_added").setText(track.added_at));
+                    xmlElement("meta", track.added_at)
+                        .setAttribute("rel", "date_added"));
+                if (track.track.external_urls.spotify)
+                {
+                    trackElement.addContent(
+                        xmlElement("location", track.track.external_urls.spotify));
+                }
 
                 trackList.addContent(trackElement);
             });
@@ -394,6 +407,7 @@ function backupPlaylists()
             common.updateOrCreateFile(backupFolder, name + ".xspf", output);
         }
     }
+
 }
 
 function main()
@@ -401,6 +415,5 @@ function main()
     backupProfile();
     backupFollowing();
     backupSaved();
-
-    // Backup all playlists
+    backupPlaylists();
 }
