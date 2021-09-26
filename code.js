@@ -306,20 +306,12 @@ function backupSavedEpisodes()
     }
 }
 
-function backupSaved()
-{
-    backupSavedTracks();
-    backupSavedAlbums();
-    backupSavedShows();
-    backupSavedEpisodes();
-}
-
 function backupPlaylists()
 {
     // Retrieve auth
     var accessToken = retrieveAuth();
 
-    // Make a folder for all list files
+    // Make a folder for playlist files
     var backupFolder = common.findOrCreateFolder(config.backupDir, "playlists").getId();
 
     // Retrieve a list of all the lists
@@ -328,14 +320,37 @@ function backupPlaylists()
     allPlaylists = common.collateArrays("items", allPlaylists);
 
     // Save a list of playlists, in original order (folder order)
-    var playlistList = allPlaylists.map(list => {return list.name});
-    common.updateOrCreateFile(backupFolder, "playlists.txt", playlistList);
+    if (config.outputFormat.includes("raw"))
+    {
+        // Save the json file in the indicated Google Drive folder
+        var output = JSON.stringify(allPlaylists, null, 4);
+        common.updateOrCreateFile(backupFolder, "playlists.json", output);
+    }
 
-    // Iterate through the lists and retrieve each one
+    if (config.outputFormat.includes("csv"))
+    {
+        var csvData = "name, owner, uri, description\n";
+
+        allPlaylists.forEach(list =>
+        {
+            var line = JSON.stringify(list.name) + ",";
+            line += JSON.stringify(list.owner.display_name) + ",";
+            line += list.uri + ",";
+            line += JSON.stringify(list.description) + ",";
+            csvData += line + "\n"
+        });
+
+        common.updateOrCreateFile(backupFolder, "playlists.csv", csvData);
+    }
+
+    // Iterate through the lists, retrieve & backup each one
     for (list of allPlaylists)
     {
+        // Setup playlist filename
+        var filename = list.name + "_" + list.id;
+        filename = filename.replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
+
         // Retrieve playlist tracks
-        var name = list.name + "_" + list.id;
         var tracks = getData(accessToken, list.tracks.href + params, true);
         tracks = common.collateArrays("items", tracks);
         list.tracks = tracks;
@@ -425,10 +440,18 @@ function backupPlaylists()
 
 }
 
+function backupLibrary()
+{
+    backupFollowing();
+    backupSavedTracks();
+    backupSavedAlbums();
+    backupSavedShows();
+    backupSavedEpisodes();
+}
+
 function main()
 {
     backupProfile();
-    backupFollowing();
-    backupSaved();
+    backupLibrary();
     backupPlaylists();
 }
