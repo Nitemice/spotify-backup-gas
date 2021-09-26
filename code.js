@@ -10,7 +10,7 @@ const savedAlbumsUrl = baseUrl + "/me/albums";
 const savedShowsUrl = baseUrl + "/me/shows";
 const savedEpisodesUrl = baseUrl + "/me/episodes";
 
-// PLaylist URLs
+// Playlist URLs
 const playlistsUrl = baseUrl + "/me/playlists";
 
 function getData(accessToken, url, getAllPages = false)
@@ -111,12 +111,15 @@ function backupFollowing()
         return 0;
     });
 
+    // Make a folder for playlist files
+    var backupFolder = common.findOrCreateFolder(config.backupDir, "library").getId();
+
     // Save to disk
-    var filename = "following";
+    var filename = "artists";
     if (config.outputFormat.includes("raw"))
     {
         var output = JSON.stringify(data, null, 4);
-        common.updateOrCreateFile(config.backupDir, filename + ".json", output);
+        common.updateOrCreateFile(backupFolder, filename + ".json", output);
     }
     if (config.outputFormat.includes("csv"))
     {
@@ -127,11 +130,11 @@ function backupFollowing()
             var line = JSON.stringify(artist.name) + ",";
             line += artist.uri + ",";
             line += artist.followers.total + ",";
-            line += artist.genres.toString() + ",";
+            line += JSON.stringify(artist.genres.toString()) + ",";
             csvData += line + "\n"
         });
 
-        common.updateOrCreateFile(config.backupDir, filename + ".csv", csvData);
+        common.updateOrCreateFile(backupFolder, filename + ".csv", csvData);
     }
 }
 
@@ -147,12 +150,15 @@ function backupSavedTracks()
     // Fold array of responses into single structure
     data = common.collateArrays("items", data);
 
+    // Make a folder for playlist files
+    var backupFolder = common.findOrCreateFolder(config.backupDir, "library").getId();
+
     // Save to disk
-    var filename = "savedTracks";
+    var filename = "likedTracks";
     if (config.outputFormat.includes("raw"))
     {
         var output = JSON.stringify(data, null, 4);
-        common.updateOrCreateFile(config.backupDir, filename + ".json", output);
+        common.updateOrCreateFile(backupFolder, filename + ".json", output);
     }
     if (config.outputFormat.includes("csv"))
     {
@@ -174,7 +180,7 @@ function backupSavedTracks()
             csvData += line + "\n"
         });
 
-        common.updateOrCreateFile(config.backupDir, filename + ".csv", csvData);
+        common.updateOrCreateFile(backupFolder, filename + ".csv", csvData);
     }
 }
 
@@ -190,12 +196,15 @@ function backupSavedAlbums()
     // Fold array of responses into single structure
     data = common.collateArrays("items", data);
 
+    // Make a folder for playlist files
+    var backupFolder = common.findOrCreateFolder(config.backupDir, "library").getId();
+
     // Save to disk
-    var filename = "savedAlbums";
+    var filename = "albums";
     if (config.outputFormat.includes("raw"))
     {
         var output = JSON.stringify(data, null, 4);
-        common.updateOrCreateFile(config.backupDir, filename + ".json", output);
+        common.updateOrCreateFile(backupFolder, filename + ".json", output);
     }
     if (config.outputFormat.includes("csv"))
     {
@@ -215,7 +224,7 @@ function backupSavedAlbums()
             csvData += line + "\n"
         });
 
-        common.updateOrCreateFile(config.backupDir, filename + ".csv", csvData);
+        common.updateOrCreateFile(backupFolder, filename + ".csv", csvData);
     }
 }
 
@@ -231,12 +240,15 @@ function backupSavedShows()
     // Fold array of responses into single structure
     data = common.collateArrays("items", data);
 
+    // Make a folder for playlist files
+    var backupFolder = common.findOrCreateFolder(config.backupDir, "library").getId();
+
     // Save to disk
-    var filename = "savedShows";
+    var filename = "podcasts";
     if (config.outputFormat.includes("raw"))
     {
         var output = JSON.stringify(data, null, 4);
-        common.updateOrCreateFile(config.backupDir, filename + ".json", output);
+        common.updateOrCreateFile(backupFolder, filename + ".json", output);
     }
     if (config.outputFormat.includes("csv"))
     {
@@ -251,7 +263,7 @@ function backupSavedShows()
             csvData += line + "\n"
         });
 
-        common.updateOrCreateFile(config.backupDir, filename + ".csv", csvData);
+        common.updateOrCreateFile(backupFolder, filename + ".csv", csvData);
     }
 }
 
@@ -267,12 +279,15 @@ function backupSavedEpisodes()
     // Fold array of responses into single structure
     data = common.collateArrays("items", data);
 
+    // Make a folder for playlist files
+    var backupFolder = common.findOrCreateFolder(config.backupDir, "library").getId();
+
     // Save to disk
     var filename = "savedEpisodes";
     if (config.outputFormat.includes("raw"))
     {
         var output = JSON.stringify(data, null, 4);
-        common.updateOrCreateFile(config.backupDir, filename + ".json", output);
+        common.updateOrCreateFile(backupFolder, filename + ".json", output);
     }
     if (config.outputFormat.includes("csv"))
     {
@@ -287,7 +302,7 @@ function backupSavedEpisodes()
             csvData += line + "\n"
         });
 
-        common.updateOrCreateFile(config.backupDir, filename + ".csv", csvData);
+        common.updateOrCreateFile(backupFolder, filename + ".csv", csvData);
     }
 }
 
@@ -329,7 +344,7 @@ function backupPlaylists()
         {
             // Save the json file in the indicated Google Drive folder
             var output = JSON.stringify(list, null, 4);
-            common.updateOrCreateFile(backupFolder, name + ".json", output);
+            common.updateOrCreateFile(backupFolder, filename + ".json", output);
         }
 
         if (config.outputFormat.includes("csv"))
@@ -352,7 +367,7 @@ function backupPlaylists()
                 csvData += line + "\n"
             });
 
-            common.updateOrCreateFile(backupFolder, name + ".csv", csvData);
+            common.updateOrCreateFile(backupFolder, filename + ".csv", csvData);
         }
 
         if (config.outputFormat.includes("xspf"))
@@ -404,7 +419,7 @@ function backupPlaylists()
             // Prepare XML for output
             var document = XmlService.createDocument(root);
             var output = XmlService.getPrettyFormat().format(document);
-            common.updateOrCreateFile(backupFolder, name + ".xspf", output);
+            common.updateOrCreateFile(backupFolder, filename + ".xspf", output);
         }
     }
 
