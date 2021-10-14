@@ -76,6 +76,9 @@ const config = {
 + `backupDir`: The ID of the Google Drive directory, where exported data
     should be stored. This can be found by navigating to the folder, and
     grabbing the ID from the tail of the URL.
++ `removeMissingPlaylists`: This option will remove backed up playlist files if
+    they do not match a current playlist.
+
 
 ### 3. Load the script into a new Google Apps Script project
 

@@ -4,5 +4,6 @@ const config = {
     
     "outputFormat": ["raw", "csv", "xspf"],
 
-    "backupDir": "xzshxhX8QjQnlNuF_KWzSytboL6EvtSLW"
+    "backupDir": "xzshxhX8QjQnlNuF_KWzSytboL6EvtSLW",
+    "removeMissingPlaylists": false
 };
