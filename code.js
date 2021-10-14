@@ -314,7 +314,7 @@ function backupPlaylists()
     // Make a folder for playlist files
     var backupFolder = common.findOrCreateFolder(config.backupDir, "playlists").getId();
 
-    // Retrieve a list of all the lists
+    // Retrieve a list of all the playlists
     var params = "?limit=50";
     var allPlaylists = getData(accessToken, playlistsUrl + params, true);
     allPlaylists = common.collateArrays("items", allPlaylists);
@@ -343,12 +343,26 @@ function backupPlaylists()
         common.updateOrCreateFile(backupFolder, "playlists.csv", csvData);
     }
 
+    // Retrieve a meta list of playlists for service purposes
+    var metaListFile = common.findOrCreateFile(backupFolder, "meta.list.json", "{}");
+    var metaList = common.grabJson(metaListFile.getId());
+    var killList = common.grabJson(metaListFile.getId());
+
     // Iterate through the lists, retrieve & backup each one
     for (list of allPlaylists)
     {
         // Setup playlist filename
         var filename = list.name + "_" + list.id;
         filename = filename.replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
+
+        // Check if this playlist has been updated since last backup
+        if (metaList[filename] &&
+            metaList[filename].snapshotId == list.snapshot_id)
+        {
+            delete killList[filename];
+            continue;
+        }
+
 
         // Retrieve playlist tracks
         var tracks = getData(accessToken, list.tracks.href + params, true);
@@ -368,6 +382,10 @@ function backupPlaylists()
 
             tracks.forEach(track =>
             {
+                if (!track.track)
+                {
+                    return;
+                }
                 var line = JSON.stringify(track.track.name) + ",";
                 track.track.artists.forEach(artist =>
                 {
@@ -401,6 +419,10 @@ function backupPlaylists()
 
             tracks.forEach(track =>
             {
+                if (!track.track)
+                {
+                    return;
+                }
                 var trackElement = XmlService.createElement("track");
                 trackElement.addContent(xmlElement("identifier", track.track.uri));
                 trackElement.addContent(xmlElement("title", track.track.name));
@@ -436,8 +458,36 @@ function backupPlaylists()
             var output = XmlService.getPrettyFormat().format(document);
             common.updateOrCreateFile(backupFolder, filename + ".xspf", output);
         }
+
+        // Update meta playlist list with new info
+        metaList[filename] = {
+            "id": list.id,
+            "name": list.name,
+            "snapshotId": list.snapshot_id
+        };
+        delete killList[filename];
+
+        // Write the meta list, so we don't lose anything
+        metaListFile.setContent(JSON.stringify(metaList));
     }
 
+    // Delete playlists that no longer exist,
+    // i.e. on the meta list, but not returned by the API
+    if (config.removeMissingPlaylists && Object.keys(killList).length > 0)
+    {
+        for (const [filename, info] of Object.entries(killList))
+        {
+            common.deleteFile(backupFolder, filename + ".json");
+            common.deleteFile(backupFolder, filename + ".csv");
+            common.deleteFile(backupFolder, filename + ".xspf");
+
+            // Remove the now-deleted file from the meta list
+            delete metaList[filename];
+
+            // Write the meta list, so we don't lose anything
+            metaListFile.setContent(JSON.stringify(metaList));
+        }
+    }
 }
 
 function backupLibrary()
