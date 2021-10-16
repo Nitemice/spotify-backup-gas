@@ -57,7 +57,8 @@ const config = {
     "clientId": "<Spotify client ID>",
     "clientSecret": "<Spotify client secret>",
     "outputFormat":  ["raw", "csv", "xspf"],
-    "backupDir": "<Google Drive directory ID>"
+    "backupDir": "<Google Drive directory ID>",
+    "removeMissingPlaylists": <true/false>
 };
 ```
 
@@ -76,8 +77,8 @@ const config = {
 + `backupDir`: The ID of the Google Drive directory, where exported data
     should be stored. This can be found by navigating to the folder, and
     grabbing the ID from the tail of the URL.
-+ `removeMissingPlaylists`: This option will remove backed up playlist files if
-    they do not match a current playlist.
++ `removeMissingPlaylists`: This option will remove backed up playlist files
+    if they do not match a current playlist, e.g. name changed, or deleted.
 
 
 ### 3. Load the script into a new Google Apps Script project
