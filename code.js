@@ -317,7 +317,7 @@ function backupPlaylists()
     // Retrieve a list of all the playlists
     var params = "?limit=50";
     var allPlaylists = getData(accessToken, playlistsUrl + params, true);
-    allPlaylists = common.collateArrays("items", allPlaylists);
+    allPlaylists = common.collateArrays("items", allPlaylists, true);
 
     // Save a list of playlists, in original order (folder order)
     if (config.outputFormat.includes("raw"))

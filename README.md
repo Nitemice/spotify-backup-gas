@@ -112,4 +112,5 @@ credentials, it will throw an error.
 
 ## Credits
 
-Inspired by [simonbru/spotify-backup](https://github.com/simonbru/spotify-backup).
+Inspired by
+[simonbru/spotify-backup](https://github.com/simonbru/spotify-backup).
