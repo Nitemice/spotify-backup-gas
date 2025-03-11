@@ -436,8 +436,11 @@ function backupPlaylists()
                 artists = artists.slice(0, -1);
                 trackElement.addContent(xmlElement("creator", artists));
 
-                trackElement.addContent(
-                    xmlElement("album", track.track.album.name));
+                if (track.track.album.name)
+                {
+                    trackElement.addContent(
+                        xmlElement("album", track.track.album.name));
+                }
                 trackElement.addContent(
                     xmlElement("trackNum", track.track.track_number));
                 trackElement.addContent(
