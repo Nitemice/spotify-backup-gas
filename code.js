@@ -79,8 +79,7 @@ function backupProfile()
     var data = getData(accessToken, profileUrl);
 
     // Save to disk
-    var filename = "profile.json";
-    common.updateOrCreateFile(config.backupDir, filename, data);
+    common.updateOrCreateJsonFile(config.backupDir, "profile.json", data);
 }
 
 function backupFollowing()
@@ -118,8 +117,7 @@ function backupFollowing()
     var filename = "artists";
     if (config.outputFormat.includes("raw"))
     {
-        var output = JSON.stringify(data, null, 4);
-        common.updateOrCreateFile(backupFolder, filename + ".json", output);
+        common.updateOrCreateJsonFile(backupFolder, filename + ".json", data);
     }
     if (config.outputFormat.includes("csv"))
     {
@@ -157,8 +155,7 @@ function backupSavedTracks()
     var filename = "likedTracks";
     if (config.outputFormat.includes("raw"))
     {
-        var output = JSON.stringify(data, null, 4);
-        common.updateOrCreateFile(backupFolder, filename + ".json", output);
+        common.updateOrCreateJsonFile(backupFolder, filename + ".json", data);
     }
     if (config.outputFormat.includes("csv"))
     {
@@ -203,8 +200,7 @@ function backupSavedAlbums()
     var filename = "albums";
     if (config.outputFormat.includes("raw"))
     {
-        var output = JSON.stringify(data, null, 4);
-        common.updateOrCreateFile(backupFolder, filename + ".json", output);
+        common.updateOrCreateJsonFile(backupFolder, filename + ".json", data);
     }
     if (config.outputFormat.includes("csv"))
     {
@@ -247,8 +243,7 @@ function backupSavedShows()
     var filename = "podcasts";
     if (config.outputFormat.includes("raw"))
     {
-        var output = JSON.stringify(data, null, 4);
-        common.updateOrCreateFile(backupFolder, filename + ".json", output);
+        common.updateOrCreateJsonFile(backupFolder, filename + ".json", data);
     }
     if (config.outputFormat.includes("csv"))
     {
@@ -286,8 +281,7 @@ function backupSavedEpisodes()
     var filename = "savedEpisodes";
     if (config.outputFormat.includes("raw"))
     {
-        var output = JSON.stringify(data, null, 4);
-        common.updateOrCreateFile(backupFolder, filename + ".json", output);
+        common.updateOrCreateJsonFile(backupFolder, filename + ".json", data);
     }
     if (config.outputFormat.includes("csv"))
     {
@@ -323,8 +317,7 @@ function backupPlaylists()
     if (config.outputFormat.includes("raw"))
     {
         // Save the json file in the indicated Google Drive folder
-        var output = JSON.stringify(allPlaylists, null, 4);
-        common.updateOrCreateFile(backupFolder, "playlists.json", output);
+        common.updateOrCreateJsonFile(backupFolder, "playlists.json", allPlaylists);
     }
 
     if (config.outputFormat.includes("csv"))
@@ -344,9 +337,10 @@ function backupPlaylists()
     }
 
     // Retrieve a meta list of playlists for service purposes
-    var metaListFile = common.findOrCreateFile(backupFolder, "meta.list.json", "{}");
-    var metaList = common.grabJson(metaListFile.getId());
-    var killList = common.grabJson(metaListFile.getId());
+    var metaListFile =
+        common.findOrCreateFile(backupFolder, "meta.list.json", "{}");
+    let metaList = common.getJsonFileContent(metaListFile);
+    let killList = { ...metaList };
 
     // Iterate through the lists, retrieve & backup each one
     for (list of allPlaylists)
@@ -372,8 +366,7 @@ function backupPlaylists()
         if (config.outputFormat.includes("raw"))
         {
             // Save the json file in the indicated Google Drive folder
-            var output = JSON.stringify(list, null, 4);
-            common.updateOrCreateFile(backupFolder, filename + ".json", output);
+            common.updateOrCreateJsonFile(backupFolder, filename + ".json", list);
         }
 
         if (config.outputFormat.includes("csv"))
