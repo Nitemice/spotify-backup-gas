@@ -357,6 +357,16 @@ function backupPlaylists()
             continue;
         }
 
+        // Download cover images for playlists
+        if (config.downloadPlaylistCover)
+        {
+            var imgUrl = list.images.find((image) => image.height = "640");
+            if (imgUrl)
+            {
+                var img = UrlFetchApp.fetch(imgUrl.url).getAs('image/jpeg');
+                common.updateOrCreateBlobFile(backupFolder, filename + ".jpg", img);
+            }
+        }
 
         // Retrieve playlist tracks
         var tracks = getData(accessToken, list.tracks.href + params, true);
@@ -476,6 +486,7 @@ function backupPlaylists()
             common.deleteFile(backupFolder, filename + ".json");
             common.deleteFile(backupFolder, filename + ".csv");
             common.deleteFile(backupFolder, filename + ".xspf");
+            common.deleteFile(backupFolder, filename + ".jpg");
 
             // Remove the now-deleted file from the meta list
             delete metaList[filename];
