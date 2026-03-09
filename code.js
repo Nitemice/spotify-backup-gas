@@ -64,12 +64,6 @@ function getData(accessToken, url, getAllPages = false)
     return data;
 }
 
-// Just a wrapper function to simplify some code
-function xmlElement(type, text)
-{
-    return XmlService.createElement(type).setText(text);
-}
-
 function backupProfile()
 {
     // Retrieve auth
@@ -110,7 +104,7 @@ function backupFollowing()
         return 0;
     });
 
-    // Make a folder for playlist files
+    // Make a folder for files
     var backupFolder = common.findOrCreateFolder(config.backupDir, "library").getId();
 
     // Save to disk
@@ -148,7 +142,7 @@ function backupSavedTracks()
     // Fold array of responses into single structure
     data = common.collateArrays("items", data);
 
-    // Make a folder for playlist files
+    // Make a folder for files
     var backupFolder = common.findOrCreateFolder(config.backupDir, "library").getId();
 
     // Save to disk
@@ -193,7 +187,7 @@ function backupSavedAlbums()
     // Fold array of responses into single structure
     data = common.collateArrays("items", data);
 
-    // Make a folder for playlist files
+    // Make a folder for files
     var backupFolder = common.findOrCreateFolder(config.backupDir, "library").getId();
 
     // Save to disk
@@ -236,7 +230,7 @@ function backupSavedShows()
     // Fold array of responses into single structure
     data = common.collateArrays("items", data);
 
-    // Make a folder for playlist files
+    // Make a folder for files
     var backupFolder = common.findOrCreateFolder(config.backupDir, "library").getId();
 
     // Save to disk
@@ -274,7 +268,7 @@ function backupSavedEpisodes()
     // Fold array of responses into single structure
     data = common.collateArrays("items", data);
 
-    // Make a folder for playlist files
+    // Make a folder for files
     var backupFolder = common.findOrCreateFolder(config.backupDir, "library").getId();
 
     // Save to disk
@@ -412,11 +406,11 @@ function backupPlaylists()
             var root = XmlService.createElement("playlist", ns)
                 .setAttribute("version", "1");
             root.addContent(
-                xmlElement("creator", list.owner.display_name));
-            root.addContent(xmlElement("annotation", list.description));
-            root.addContent(xmlElement("title", list.name));
-            root.addContent(xmlElement("location", list.external_urls.spotify));
-            root.addContent(xmlElement("identifier", list.uri));
+                common.xmlElement("creator", list.owner.display_name));
+            root.addContent(common.xmlElement("annotation", list.description));
+            root.addContent(common.xmlElement("title", list.name));
+            root.addContent(common.xmlElement("location", list.external_urls.spotify));
+            root.addContent(common.xmlElement("identifier", list.uri));
 
             var trackList = XmlService.createElement("trackList");
 
@@ -427,8 +421,8 @@ function backupPlaylists()
                     return;
                 }
                 var trackElement = XmlService.createElement("track");
-                trackElement.addContent(xmlElement("identifier", track.track.uri));
-                trackElement.addContent(xmlElement("title", track.track.name));
+                trackElement.addContent(common.xmlElement("identifier", track.track.uri));
+                trackElement.addContent(common.xmlElement("title", track.track.name));
 
                 var artists = "";
                 track.track.artists.forEach(artist =>
@@ -437,22 +431,22 @@ function backupPlaylists()
 
                 });
                 artists = artists.slice(0, -1);
-                trackElement.addContent(xmlElement("creator", artists));
+                trackElement.addContent(common.xmlElement("creator", artists));
 
                 if (track.track.album.name)
                 {
                     trackElement.addContent(
-                        xmlElement("album", track.track.album.name));
+                        common.xmlElement("album", track.track.album.name));
                 }
                 trackElement.addContent(
-                    xmlElement("trackNum", track.track.track_number));
+                    common.xmlElement("trackNum", track.track.track_number));
                 trackElement.addContent(
-                    xmlElement("meta", track.added_at)
+                    common.xmlElement("meta", track.added_at)
                         .setAttribute("rel", "date_added"));
                 if (track.track.external_urls.spotify)
                 {
                     trackElement.addContent(
-                        xmlElement("location", track.track.external_urls.spotify));
+                        common.xmlElement("location", track.track.external_urls.spotify));
                 }
 
                 trackList.addContent(trackElement);

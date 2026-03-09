@@ -1,5 +1,5 @@
 // Common GAS Functions
-// v2.5.0 - 2025-04-26
+// v2.6.1 - 2026-03-09
 
 var common = {
 
@@ -81,7 +81,7 @@ var common = {
      */
     updateOrCreateFile: function(parentDir, filename, content)
     {
-        var file = common.findOrCreateFile(parentDir, filename);
+        var file = this.findOrCreateFile(parentDir, filename);
 
         // Check if the contents already matches
         if (file.getBlob().getDataAsString() != content)
@@ -103,7 +103,7 @@ var common = {
      */
     appendOrCreateFile: function(parentDir, filename, newContent)
     {
-        var file = common.findOrCreateFile(parentDir, filename);
+        var file = this.findOrCreateFile(parentDir, filename);
 
         // Retrieve existing file content
         var content = file.getBlob().getDataAsString();
@@ -127,7 +127,7 @@ var common = {
     updateOrCreateBlobFile: function(parentDir, filename, content)
     {
         // Start off by deleting any old file with the same name
-        common.deleteFile(parentDir, filename);
+        this.deleteFile(parentDir, filename);
 
         // Create a new file, with the new contents
         var folder = DriveApp.getFolderById(parentDir);
@@ -301,4 +301,17 @@ var common = {
         date.setUTCSeconds(seconds);
         return date.toISOString();
     },
+
+    /**
+     * Create a XML element of given type, with given text
+     * 
+     * @param {string} type - Type of XML element
+     * @param {string} text - Text in XML element
+     * @returns {Element} - XML element
+     */
+    xmlElement: function(type, text)
+    {
+        return XmlService.createElement(type).setText(text);
+    },
+
 };
