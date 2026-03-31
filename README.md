@@ -79,7 +79,8 @@ const config = {
     grabbing the ID from the tail of the URL.
 + `removeMissingPlaylists`: This option will remove backed up playlist files
     if they do not match a current playlist, e.g. name changed, or deleted.
-
++ `downloadPlaylistCover`: This option will also download cover art for each
+    playlist.
 
 ### 3. Load the script into a new Google Apps Script project
 
