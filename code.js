@@ -354,7 +354,7 @@ function backupPlaylists()
         // Download cover images for playlists
         if (config.downloadPlaylistCover)
         {
-            var imgUrl = list.images.find((image) => image.height = "640");
+            var imgUrl = list.images.find((image) => image.height == "640");
             if (imgUrl)
             {
                 var img = UrlFetchApp.fetch(imgUrl.url).getAs('image/jpeg');

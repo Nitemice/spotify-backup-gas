@@ -93,8 +93,14 @@ function refreshAuth(refreshToken)
 
     // Grab the values we're looking for and return them
     var newTokens = JSON.parse(response.getContentText());
-    var authInfo = new Object();
 
+    if (newTokens.error === 'invalid_grant')
+    {
+        throw new Error("Expired refresh token. You need to deploy & re-run authentication.",
+            { cause: "Expired refresh token" });
+    }
+
+    var authInfo = new Object();
     authInfo.accessToken = newTokens.access_token;
     if (newTokens.refresh_token)
     {
@@ -135,7 +141,18 @@ function retrieveAuth()
     {
         // Refresh the auth info
         Logger.log("Access token expired. Refreshing authentication...");
-        authInfo = refreshAuth(authInfo.refreshToken);
+        try
+        {
+            authInfo = refreshAuth(authInfo.refreshToken);
+        }
+        catch (error)
+        {
+            if (error.cause = "Expired refresh token")
+            {
+                userProperties.deleteProperty("refreshToken");
+            }
+            throw error;
+        }
 
         // Save the new auth info back to the user properties store
         userProperties.setProperties(authInfo);
