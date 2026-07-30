@@ -55,7 +55,8 @@ function getFreshAuth(code)
     var options = {
         'method': 'post',
         'Content-Type': 'application/json',
-        'payload': payload
+        'payload': payload,
+        "muteHttpExceptions": true,
     };
 
     var response = UrlFetchApp.fetch(refreshUrl, options);
@@ -86,7 +87,8 @@ function refreshAuth(refreshToken)
     var options = {
         'method': 'post',
         'Content-Type': 'application/json',
-        'payload': payload
+        'payload': payload,
+        "muteHttpExceptions": true,
     };
 
     var response = UrlFetchApp.fetch(refreshUrl, options);
@@ -147,7 +149,7 @@ function retrieveAuth()
         }
         catch (error)
         {
-            if (error.cause = "Expired refresh token")
+            if (error.cause === "Expired refresh token")
             {
                 userProperties.deleteProperty("refreshToken");
             }
